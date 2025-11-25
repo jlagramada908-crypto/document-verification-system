@@ -64,21 +64,23 @@
         }
 
         .system-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
+            width: 120px;
+            height: 120px;
             background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: float 3s ease-in-out infinite;
+            padding: 8px;
         }
 
-        .system-icon svg {
-            width: 45px;
-            height: 45px;
-            fill: #667eea;
+        .system-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .login-form {
@@ -339,9 +341,7 @@
     <div class="login-container">
         <div class="login-header">
             <div class="system-icon">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                </svg>
+                <img src="./images/President_Ramon_Magsaysay_State_University.png" alt="PRMSU Logo">
             </div>
             <h1>Admin Portal</h1>
             <p>President Ramon Magsaysay State University Verification System</p>

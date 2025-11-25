@@ -192,12 +192,12 @@ router.post('/finalize', async (req, res) => {
             try {
                 const simulatedResult = {
                     transactionHash: '0x' + Math.random().toString(16).substr(2, 64),
-                    block_number: Math.floor(Math.random() * 1000000)
+                    blockNumber: Math.floor(Math.random() * 1000000)
                 };
                 
                 const watermarkData = {
                     txHash: simulatedResult.transactionHash,
-                    block_number: simulatedResult.block_number,
+                    block_number: simulatedResult.blockNumber,
                     timestamp: new Date().toISOString(),
                     verified: true
                 };
@@ -225,7 +225,7 @@ router.post('/finalize', async (req, res) => {
                 `UPDATE documents 
                  SET blockchain_tx_hash = $1, block_number = $2, verified = true, watermarked_file_path = $3
                  WHERE document_hash = $4`,
-                [simulatedResult.transactionHash, simulatedResult.block_number, watermarked_file_path, document_hash]
+                [simulatedResult.transactionHash, simulatedResult.blockNumber, watermarked_file_path, document_hash]
             );
             
             console.log('Database updated with watermark path');
@@ -242,7 +242,7 @@ router.post('/finalize', async (req, res) => {
             return res.json({
                 success: true,
                 transactionHash: simulatedResult.transactionHash,
-                block_number: simulatedResult.block_number,
+                block_number: simulatedResult.blockNumber,
                 watermarkedFile: watermarked_file_path,
                 message: 'Document verified (simulation mode - blockchain not connected)',
                 verified: true
@@ -289,6 +289,7 @@ router.post('/finalize', async (req, res) => {
             documentContent: document_hash
         });
         
+
         if (!blockchainResult.success) {
             console.error('Blockchain registration failed:', blockchainResult);
             return res.status(500).json({ 
@@ -309,7 +310,7 @@ router.post('/finalize', async (req, res) => {
         try {
             const watermarkData = {
                 txHash: blockchainResult.transactionHash,
-                block_number: blockchainResult.block_number,
+                block_number: blockchainResult.blockNumber,
                 timestamp: new Date().toISOString(),
                 verified: true
             };
@@ -337,14 +338,14 @@ router.post('/finalize', async (req, res) => {
                 `UPDATE documents 
                  SET blockchain_tx_hash = $1, block_number = $2, verified = true, watermarked_file_path = $3
                  WHERE document_hash = $4`,
-                [blockchainResult.transactionHash, blockchainResult.block_number, watermarked_file_path, document_hash]
+                [blockchainResult.transactionHash, blockchainResult.blockNumber, watermarked_file_path, document_hash]
             );
         } else {
             await db.query(
                 `UPDATE documents 
                  SET blockchain_tx_hash = $1, block_number = $2, verified = true
                  WHERE document_hash = $3`,
-                [blockchainResult.transactionHash, blockchainResult.block_number, document_hash]
+                [blockchainResult.transactionHash, blockchainResult.blockNumber, document_hash]
             );
         }
         
@@ -354,7 +355,7 @@ router.post('/finalize', async (req, res) => {
         res.json({
             success: true,
             transactionHash: blockchainResult.transactionHash,
-            block_number: blockchainResult.block_number,
+            block_number: blockchainResult.blockNumber,
             watermarkedFile: watermarked_file_path,
             message: 'Document successfully verified on blockchain',
             verified: true

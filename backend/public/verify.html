@@ -455,22 +455,505 @@
  }
 
         @media (max-width: 768px) {
-            .verification-methods {
-                grid-template-columns: 1fr;
-            }
-            
-            .document-display {
-                grid-template-columns: 1fr;
-            }
-            
-            .container {
-                padding: 20px;
-            }
-            
-            .viewer-controls {
-                flex-direction: column;
-            }
-        }
+    
+    /* Body and container adjustments */
+    body {
+        padding: 10px;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
+    .container {
+        padding: 15px;
+        margin: 0;
+        border-radius: 8px;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Header optimizations */
+    .header {
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        font-size: 1.5em;
+        line-height: 1.2;
+    }
+
+    .header .subtitle {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    /* Verification method cards - Stack vertically */
+    .verification-methods {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .method-card {
+        padding: 20px;
+    }
+
+    .method-icon {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+
+    .method-title {
+        font-size: 1.2em;
+    }
+
+    .method-description {
+        font-size: 14px;
+    }
+
+    /* QR Scanner optimizations */
+    .scanner-container {
+        max-width: 100%;
+        margin: 15px 0;
+    }
+
+    #qr-video {
+        height: 250px;
+        max-width: 100%;
+    }
+
+    .scanner-overlay {
+        width: 150px;
+        height: 150px;
+    }
+
+    .scanner-corners {
+        width: 25px;
+        height: 25px;
+    }
+
+    /* Button groups - Stack vertically on mobile */
+    .qr-scanner > div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .qr-scanner > div:last-child .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Upload area */
+    .upload-area {
+        padding: 40px 20px;
+    }
+
+    .upload-icon {
+        font-size: 2.5em;
+    }
+
+    .upload-text {
+        font-size: 1em;
+    }
+
+    .upload-hint {
+        font-size: 13px;
+    }
+
+    /* Document display - Single column on mobile */
+    .document-display {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Document details */
+    .document-details {
+        padding: 20px;
+        order: 2; /* Show below viewer on mobile */
+    }
+
+    .document-details h3 {
+        font-size: 1.1em;
+        margin-bottom: 15px;
+    }
+
+    .detail-group {
+        margin-bottom: 15px;
+    }
+
+    .detail-label {
+        font-size: 12px;
+    }
+
+    .detail-value {
+        padding: 10px 12px;
+        font-size: 14px;
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    /* Hash display - Ensure it wraps properly */
+    .hash-display {
+        font-size: 10px;
+        padding: 10px;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+    }
+
+    /* Status badges */
+    .status-badge {
+        font-size: 12px;
+        padding: 6px 12px;
+        display: inline-block;
+        width: auto;
+    }
+
+    .security-badge {
+        font-size: 11px;
+        padding: 3px 10px;
+        margin-left: 0;
+        margin-top: 8px;
+        display: inline-block;
+    }
+
+    /* Blockchain info */
+    .blockchain-info {
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .blockchain-details {
+        font-size: 11px;
+        padding: 12px;
+        word-break: break-all;
+    }
+
+    /* Document viewer */
+    .document-viewer {
+        padding: 15px;
+        order: 1; /* Show above details on mobile */
+    }
+
+    .viewer-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .viewer-title {
+        font-size: 1em;
+    }
+
+    .viewer-controls {
+        width: 100%;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .viewer-controls .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* iFrame adjustments */
+    iframe,
+    #document-frame {
+        height: 400px;
+        min-height: 300px;
+        max-width: 100%;
+    }
+
+    /* PDF scroll container */
+    #pdf-scroll-container {
+        padding: 10px;
+    }
+
+    #pdf-scroll-container canvas {
+        max-width: 100% !important;
+        height: auto !important;
+        width: 100% !important;
+        margin-bottom: 15px;
+    }
+
+    /* Tamper warning adjustments */
+    .tamper-warning,
+    #tamper-warning {
+        padding: 20px 15px;
+        margin: 15px 0;
+    }
+
+    .tamper-warning h2,
+    #tamper-warning h2 {
+        font-size: 1.3em;
+    }
+
+    .tamper-warning .detail-group,
+    #tamper-warning .detail-group {
+        margin-bottom: 12px;
+    }
+
+    /* Authentic success adjustments */
+    .authentic-success,
+    #authentic-success {
+        padding: 20px 15px;
+        margin: 15px 0;
+    }
+
+    .authentic-success h2,
+    #authentic-success h2 {
+        font-size: 1.3em;
+    }
+
+    /* Button adjustments in warning/success messages */
+    #tamper-warning .btn,
+    #authentic-success .btn {
+        width: 100%;
+        margin: 5px 0 !important;
+        display: block;
+    }
+
+    /* Loading section */
+    .loading {
+        padding: 30px 15px;
+    }
+
+    .loading-spinner {
+        width: 35px;
+        height: 35px;
+        margin-bottom: 15px;
+    }
+
+    /* Error section */
+    .error,
+    .success {
+        padding: 15px;
+        margin: 15px 0;
+        font-size: 14px;
+    }
+
+    .error h3 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    /* Camera permission notice */
+    .camera-permission {
+        padding: 12px;
+        margin: 12px 0;
+        font-size: 14px;
+    }
+
+    /* Scanner error */
+    #scanner-error {
+        margin: 12px 0;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* Fullscreen modal adjustments */
+    #fullscreen-modal button {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    #fullscreen-modal canvas {
+        max-width: 95% !important;
+        max-height: 95% !important;
+    }
+
+    /* View-only notification */
+    .view-only-notification {
+        top: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
+        max-width: calc(100% - 20px) !important;
+        font-size: 13px !important;
+        padding: 10px 12px !important;
+    }
+
+    /* Ensure no horizontal overflow on any element */
+    * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Fix for long text content */
+    p, div, span {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Transaction info responsiveness */
+    .transaction-info {
+        font-size: 11px;
+        word-break: break-all;
+    }
+}
+
+/* Extra small devices (phones in portrait, less than 576px) */
+@media (max-width: 576px) {
+    
+    body {
+        padding: 5px;
+    }
+
+    .container {
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    .header h1 {
+        font-size: 1.3em;
+    }
+
+    .header .subtitle {
+        font-size: 13px;
+    }
+
+    .method-card {
+        padding: 15px;
+    }
+
+    .method-icon {
+        font-size: 2em;
+    }
+
+    .method-title {
+        font-size: 1.1em;
+    }
+
+    #qr-video {
+        height: 200px;
+    }
+
+    .scanner-overlay {
+        width: 120px;
+        height: 120px;
+    }
+
+    .upload-area {
+        padding: 30px 15px;
+    }
+
+    .document-details,
+    .document-viewer {
+        padding: 15px;
+    }
+
+    .detail-value {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    iframe,
+    #document-frame {
+        height: 300px;
+        min-height: 250px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .viewer-title {
+        font-size: 0.95em;
+    }
+
+    /* Make hash text smaller on very small screens */
+    .hash-display {
+        font-size: 9px;
+        padding: 8px;
+    }
+
+    .blockchain-details {
+        font-size: 10px;
+        padding: 10px;
+    }
+}
+
+/* Landscape mode adjustments for phones */
+@media (max-width: 768px) and (orientation: landscape) {
+    
+    #qr-video {
+        height: 200px;
+    }
+
+    .scanner-overlay {
+        width: 120px;
+        height: 120px;
+    }
+
+    iframe,
+    #document-frame {
+        height: 350px;
+    }
+
+    .document-display {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .document-details {
+        order: 1;
+    }
+
+    .document-viewer {
+        order: 2;
+    }
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media (max-width: 768px) {
+    input[type="file"],
+    select,
+    textarea,
+    button {
+        font-size: 16px !important;
+    }
+}
+
+/* Safe area insets for newer iPhones */
+@supports (padding: max(0px)) {
+    .container {
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+    }
+}
+
+/* Accessibility: Improve touch targets on mobile */
+@media (max-width: 768px) {
+    .btn,
+    .method-card,
+    button {
+        min-height: 44px; /* iOS recommended touch target size */
+        min-width: 44px;
+    }
+}
+
+/* Fix for iOS Safari bottom bar overlap */
+@media (max-width: 768px) {
+    .container {
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+    }
+}
+
+/* Smooth scrolling for better UX */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Prevent text size adjustment on orientation change */
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
 
         .method-card.disabled {
             opacity: 0.6;

@@ -381,32 +381,103 @@
         }
 
         .transaction-info {
-            font-family: monospace;
-            font-size: 12px;
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(255,255,255,0.7);
-            border-radius: 4px;
-        }
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    max-width: 100%;
+}
 
         @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 15px;
-            }
 
-            .upload-form {
-                grid-template-columns: 1fr;
-            }
-            
-            .container {
-                padding: 20px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-        }
+    body {
+        padding: 10px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        gap: 12px;
+        padding: 20px;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    .welcome-message {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    /* Form becomes single column */
+    .upload-form {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+    }
+
+    .form-section {
+        padding: 15px;
+    }
+
+    .form-group input,
+    .form-group select {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* Upload area */
+    .upload-area {
+        padding: 30px;
+    }
+
+    /* Buttons become full width */
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 14px;
+    }
+
+    /* Preview container */
+    .preview-section {
+        min-height: 300px;
+        height: auto;
+    }
+
+    iframe {
+        height: 350px !important;
+    }
+
+    /* Finalize section buttons full width */
+    #finalizeSection .btn-group {
+        flex-direction: column;
+    }
+
+    #finalizeSection .btn {
+        width: 100%;
+    }
+
+    /* Modal adjustments */
+    .session-modal-content {
+        width: 90%;
+        padding: 20px;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -934,6 +1005,7 @@
                 const transactionInfo = document.getElementById('transactionInfo');
 
                 document.getElementById('documentInfo').classList.add('show');
+                
                 
                 transactionInfo.innerHTML = `
                     <strong>Transaction Hash:</strong><br>
