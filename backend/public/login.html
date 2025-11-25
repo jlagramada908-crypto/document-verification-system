@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Academic Document Verification System - Admin Login">
+    <title>Admin Login - Document Verification System</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .system-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .system-icon svg {
+            width: 45px;
+            height: 45px;
+            fill: #667eea;
+        }
+
+        .login-form {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            fill: #8a92a6;
+            transition: fill 0.3s ease;
+        }
+
+        .input-wrapper input:focus + .input-icon {
+            fill: #667eea;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: #8a92a6;
+            transition: fill 0.3s ease;
+        }
+
+        .password-toggle:hover svg {
+            fill: #667eea;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .forgot-password {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .login-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .login-button.loading .button-text {
+            display: none;
+        }
+
+        .login-button.loading .spinner {
+            display: block;
+        }
+
+        .error-message, .success-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: shake 0.5s ease-in-out;
+            display: none;
+        }
+
+        .error-message {
+            background: #ffe6e6;
+            color: #d00;
+            border: 1px solid #ffcccc;
+        }
+
+        .success-message {
+            background: #e6ffe6;
+            color: #060;
+            border: 1px solid #ccffcc;
+        }
+
+        .error-message.show, .success-message.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .login-footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e1e8ed;
+        }
+
+        .login-footer p {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .security-notice {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .security-notice svg {
+            width: 16px;
+            height: 16px;
+            fill: #667eea;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 20px;
+            }
+            
+            .login-form {
+                padding: 30px 20px;
+            }
+            
+            .login-header {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Browser Compatibility */
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px #f8f9fa inset;
+            -webkit-text-fill-color: #333;
+        }
+
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px white inset;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="system-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                </svg>
+            </div>
+            <h1>Admin Portal</h1>
+            <p>President Ramon Magsaysay State University Verification System</p>
+        </div>
+
+        <div class="login-form">
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <form id="loginForm" autocomplete="on">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required 
+                            autocomplete="username"
+                            placeholder="Enter your username"
+                            maxlength="50"
+                        >
+                        <svg class="input-icon" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            autocomplete="current-password"
+                            placeholder="Enter your password"
+                            maxlength="100"
+                        >
+                        <svg class="input-icon" viewBox="0 0 24 24">
+                            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                        </svg>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <svg id="eyeIcon" viewBox="0 0 24 24">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password" onclick="handleForgotPassword(event)">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="login-button" id="loginButton">
+                    <span class="button-text">Sign In</span>
+                    <div class="spinner"></div>
+                </button>
+
+                <div class="security-notice">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                    </svg>
+                    <span>Secure connection • All data encrypted</span>
+                </div>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <p>&copy; 2025 President Ramon Magsaysay State University Verification System. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+    // Configuration
+    const API_BASE_URL = window.location.origin + '/api';  // ✅ FIXED: Consistent variable name
+    const MAX_LOGIN_ATTEMPTS = 5;
+    const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+    
+    // Track login attempts (client-side tracking for UX, real security is server-side)
+    let loginAttempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+    let lockoutUntil = parseInt(localStorage.getItem('lockoutUntil') || '0');
+
+    // Check for existing session
+    document.addEventListener('DOMContentLoaded', function() {
+        checkExistingSession();
+        checkLockout();
+        
+        // Load remembered username
+        const rememberedUsername = localStorage.getItem('rememberedUsername');
+        if (rememberedUsername) {
+            document.getElementById('username').value = rememberedUsername;
+            document.getElementById('rememberMe').checked = true;
+        }
+    });
+
+    // Check if user is already logged in
+    function checkExistingSession() {
+        const token = localStorage.getItem('adminToken');
+        if (token) {
+            // Verify token is still valid
+            fetch(`${API_BASE_URL}/auth/verify-token`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Token is valid, redirect to admin page
+                    window.location.href = 'admin.html'; // ✅ FIXED: Relative path
+                } else {
+                    // Token is invalid, clear it
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUser');
+                    localStorage.removeItem('sessionExpiry');
+                }
+            })
+            .catch(() => {
+                // Error verifying token, clear it
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                localStorage.removeItem('sessionExpiry');
+            });
+        }
+    }
+
+    // Check if account is locked out
+    function checkLockout() {
+        const now = Date.now();
+        if (lockoutUntil > now) {
+            const remainingTime = Math.ceil((lockoutUntil - now) / 60000);
+            showError(`Account temporarily locked. Please try again in ${remainingTime} minute${remainingTime > 1 ? 's' : ''}.`);
+            document.getElementById('loginButton').disabled = true;
+            
+            // Set timer to re-enable login
+            setTimeout(() => {
+                localStorage.removeItem('lockoutUntil');
+                localStorage.removeItem('loginAttempts');
+                document.getElementById('loginButton').disabled = false;
+                hideMessages();
+            }, lockoutUntil - now);
+        }
+    }
+
+    // Handle form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Check lockout
+        if (lockoutUntil > Date.now()) {
+            return;
+        }
+        
+        // Clear previous messages
+        hideMessages();
+        
+        // Get form data
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        
+        // Basic validation
+        if (!username || !password) {
+            showError('Please enter both username and password');
+            return;
+        }
+        
+        // Validate input format (alphanumeric and basic characters only)
+        const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
+        if (!usernameRegex.test(username)) {
+            showError('Invalid username format');
+            return;
+        }
+        
+        // Show loading state
+        const loginButton = document.getElementById('loginButton');
+        loginButton.classList.add('loading');
+        loginButton.disabled = true;
+        
+        try {
+            // Send login request
+            const response = await fetch(`${API_BASE_URL}/auth/admin/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                // Login successful
+                showSuccess('Login successful! Redirecting...');
+                
+                // Reset login attempts
+                localStorage.removeItem('loginAttempts');
+                localStorage.removeItem('lockoutUntil');
+                
+                // Store token
+                localStorage.setItem('adminToken', data.token);
+                
+                // Store user info
+                localStorage.setItem('adminUser', JSON.stringify({
+                    id: data.user.id,
+                    username: data.user.username,
+                    fullName: data.user.fullName,
+                    institutionName: data.user.institutionName
+                }));
+                
+                // Remember username if checked
+                if (rememberMe) {
+                    localStorage.setItem('rememberedUsername', username);
+                } else {
+                    localStorage.removeItem('rememberedUsername');
+                }
+                
+                // Set session expiry (30 minutes)
+                const sessionExpiry = Date.now() + (30 * 60 * 1000);
+                localStorage.setItem('sessionExpiry', sessionExpiry);
+                
+                // Redirect to admin page after short delay
+                setTimeout(() => {
+                    window.location.href = 'admin.html'; // ✅ FIXED: Relative path
+                }, 1000);
+                
+            } else {
+                // Login failed
+                loginAttempts++;
+                localStorage.setItem('loginAttempts', loginAttempts);
+                
+                if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+                    // Lock account
+                    lockoutUntil = Date.now() + LOCKOUT_TIME;
+                    localStorage.setItem('lockoutUntil', lockoutUntil);
+                    showError(`Too many failed attempts. Account locked for 15 minutes.`);
+                    document.getElementById('loginButton').disabled = true;
+                    
+                    // Set timer to re-enable
+                    setTimeout(() => {
+                        localStorage.removeItem('lockoutUntil');
+                        localStorage.removeItem('loginAttempts');
+                        document.getElementById('loginButton').disabled = false;
+                        hideMessages();
+                    }, LOCKOUT_TIME);
+                } else {
+                    const remainingAttempts = MAX_LOGIN_ATTEMPTS - loginAttempts;
+                    showError(data.error || `Invalid credentials. ${remainingAttempts} attempt${remainingAttempts > 1 ? 's' : ''} remaining.`);
+                }
+            }
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            showError('Connection error. Please check your internet connection and try again.');
+        } finally {
+            // Remove loading state
+            loginButton.classList.remove('loading');
+            loginButton.disabled = false;
+        }
+    });
+
+    // Toggle password visibility
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M2 2l20 20" stroke="currentColor" stroke-width="2"/>';
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+        }
+    }
+
+    // Handle forgot password
+    function handleForgotPassword(e) {
+        e.preventDefault();
+        showError('Please contact the system administrator to reset your password.');
+    }
+
+    // Show error message
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.textContent = message;
+        errorDiv.classList.add('show');
+    }
+
+    // Show success message
+    function showSuccess(message) {
+        const successDiv = document.getElementById('successMessage');
+        successDiv.textContent = message;
+        successDiv.classList.add('show');
+    }
+
+    // Hide all messages
+    function hideMessages() {
+        document.getElementById('errorMessage').classList.remove('show');
+        document.getElementById('successMessage').classList.remove('show');
+    }
+
+    // Prevent form resubmission on page refresh
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+
+    // Auto-logout on inactivity
+    let inactivityTimer;
+    const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('sessionExpiry');
+            if (window.location.pathname.includes('admin.html')) {
+                window.location.href = 'login.html'; // ✅ FIXED: Relative path
+            }
+        }, INACTIVITY_TIMEOUT);
+    }
+
+    // Monitor user activity
+    ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+        document.addEventListener(event, resetInactivityTimer, true);
+    });
+
+    // Initialize inactivity timer
+    resetInactivityTimer();
+</script>
+</body>
+</html>

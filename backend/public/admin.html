@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Document Processing System</title>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Header with User Info */
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .session-timer {
+            padding: 8px 16px;
+            background: #f0f4ff;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        /* Session Warning Modal */
+        .session-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .session-modal.show {
+            display: flex;
+        }
+
+        .session-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .session-modal h3 {
+            color: #ef4444;
+            margin-bottom: 15px;
+        }
+
+        .session-modal p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .session-modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .modal-btn-secondary {
+            background: #e5e7eb;
+            color: #333;
+        }
+
+        /* Existing styles from original admin.html */
+        .upload-form {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        .form-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .preview-section {
+            min-height: 600px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .preview-content {
+            width: 100%;
+            height: 100%;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5a67d8;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #059669;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #downloadBtn, #printBtn {
+    display: none;
+}
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .document-info {
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .document-info.show {
+            display: block;
+        }
+
+       
+
+        .blockchain-status {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .blockchain-status.show {
+            display: block;
+        }
+
+        .transaction-info {
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .upload-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with User Info and Logout -->
+    <div class="header">
+        <div class="header-left">
+            <div class="user-avatar" id="userAvatar">A</div>
+            <div class="user-info">
+                <span class="user-name" id="userName">Admin User</span>
+                <span class="user-role" id="userRole">Registrar</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="session-timer">
+                ⏱️ Session: <span id="sessionTime">30:00</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1>Document Processing System</h1>
+        <p class="welcome-message" id="welcomeMessage">Welcome back! You can process and register documents on the blockchain.</p>
+        
+        <div class="upload-form">
+            <!-- Form Section -->
+            <div class="form-section">
+                <h3>Document Information</h3>
+                
+                <form id="documentForm">
+                    <div class="form-group">
+                        <label>Student Name</label>
+                        <input type="text" id="studentName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Student ID</label>
+                        <input type="text" id="studentId" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Program</label>
+                        <input type="text" id="program" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Document Type</label>
+                        <select id="documentType" required>
+                            <option value="">Select Type</option>
+                            <option value="TOR">Transcript of Records</option>
+                            <option value="COG">Certificate of Grades</option>
+                            <option value="COG">Certificate of Enrollment</option>
+                            <option value="COR">Certificate of Registration</option>
+                            <option value="DIPLOMA">Diploma</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload Document</label>
+                        <div class="upload-area" id="uploadArea">
+                            <p>📁 Drop file here or click to browse</p>
+                            <small>PDF, Word, or Image files (max 10MB)</small>
+                            <input type="file" id="fileInput" hidden accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary" id="processBtn">
+                            Process Document
+                        </button>
+                        <button type="button" class="btn" onclick="resetForm()">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="status" class="status"></div>
+                
+                <div id="documentInfo" class="document-info">
+                    
+                    
+                    <div id="blockchainStatus" class="blockchain-status">
+                        <strong>Blockchain Status:</strong>
+                        <div id="transactionInfo" class="transaction-info"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preview Section -->
+            <div class="preview-section">
+                <div id="previewPlaceholder">
+                    <div style="text-align: center; color: #94a3b8;">
+                        <p style="font-size: 48px; margin-bottom: 20px;">📄</p>
+                        <p>Document preview will appear here</p>
+                        <small>After processing, the document with embedded QR will be shown</small>
+                    </div>
+                </div>
+                
+                <div id="previewContent" class="preview-content" style="display: none;">
+                    <iframe id="documentPreview"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <div id="finalizeSection" style="display: none; margin-top: 30px;">
+            <div style="background: #f0f9ff; padding: 20px; border-radius: 8px;">
+                <h3>Document Ready for Blockchain Registration</h3>
+                <p style="margin: 15px 0;">The QR code has been embedded in your document. You can now:</p>
+                
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="finalizeDocument()" id="finalizeBtn">
+                        ✓ Register on Blockchain
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadDocument()" id="downloadBtn">
+                        📥 Download Document
+                    </button>
+                    <button class="btn" onclick="printDocument()" id="printBtn">
+                        🖨️ Print Document
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Timeout Warning Modal -->
+    <div class="session-modal" id="sessionModal">
+        <div class="session-modal-content">
+            <h3>⚠️ Session Expiring Soon</h3>
+            <p>Your session will expire in <span id="warningTime">60</span> seconds. Would you like to continue?</p>
+            <div class="session-modal-buttons">
+                <button class="modal-btn modal-btn-primary" onclick="extendSession()">Continue Working</button>
+                <button class="modal-btn modal-btn-secondary" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Configuration
+    const API_BASE_URL = window.location.origin + '/api'; // ✅ FIXED: Consistent variable name
+    const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+    const WARNING_TIME = 60 * 1000; // Show warning 1 minute before timeout
+    
+    let currentFile = null;
+    let processedDocument = null;
+    let sessionTimer = null;
+    let warningTimer = null;
+    let sessionCountdown = null;
+    let lastActivity = Date.now();
+
+    // Authentication Check
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check authentication
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'login.html'; // ✅ FIXED: Relative path
+            return;
+        }
+
+        // Verify token is still valid
+        verifyToken();
+        
+        // Load user info
+        loadUserInfo();
+        
+        // Start session timer
+        startSessionTimer();
+        
+        // Setup activity monitoring
+        setupActivityMonitoring();
+        
+        // Setup file upload handlers
+        setupFileUpload();
+        
+        // Restore form data
+        restoreFormData();
+    });
+
+    // Verify token validity
+    async function verifyToken() {
+        const token = localStorage.getItem('adminToken');
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/verify-token`, { // ✅ FIXED: API_BASE_URL
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                // Token is invalid, redirect to login
+                localStorage.clear();
+                window.location.href = 'login.html'; // ✅ FIXED: Relative path
+            }
+        } catch (error) {
+            console.error('Token verification failed:', error);
+            // If can't verify, redirect to login for safety
+            localStorage.clear();
+            window.location.href = 'login.html'; // ✅ FIXED: Relative path
+        }
+    }
+
+    // Load user information
+    function loadUserInfo() {
+        const userInfo = JSON.parse(localStorage.getItem('adminUser') || '{}');
+        
+        if (userInfo.fullName) {
+            // Update user avatar with initials
+            const initials = userInfo.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = initials.substring(0, 2);
+            
+            // Update user name and role
+            document.getElementById('userName').textContent = userInfo.fullName;
+            document.getElementById('userRole').textContent = userInfo.institutionName || 'Registrar';
+            
+            // Update welcome message
+            document.getElementById('welcomeMessage').textContent = 
+                `Welcome back, ${userInfo.fullName}! You can process and register documents on the blockchain.`;
+        }
+    }
+
+    // Session Timer Management
+    function startSessionTimer() {
+        const sessionExpiry = parseInt(localStorage.getItem('sessionExpiry') || '0');
+        const now = Date.now();
+        
+        if (sessionExpiry <= now) {
+            // Session expired
+            logout();
+            return;
+        }
+        
+        // Update session countdown every second
+        sessionCountdown = setInterval(() => {
+            updateSessionDisplay();
+        }, 1000);
+        
+        // Set warning timer
+        const timeUntilWarning = SESSION_TIMEOUT - WARNING_TIME;
+        warningTimer = setTimeout(() => {
+            showSessionWarning();
+        }, timeUntilWarning);
+        
+        // Set final timeout
+        sessionTimer = setTimeout(() => {
+            logout();
+        }, SESSION_TIMEOUT);
+    }
+
+    function updateSessionDisplay() {
+        const sessionExpiry = parseInt(localStorage.getItem('sessionExpiry') || '0');
+        const now = Date.now();
+        const remaining = Math.max(0, sessionExpiry - now);
+        
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        
+        document.getElementById('sessionTime').textContent = 
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (remaining <= 0) {
+            logout();
+        }
+    }
+
+    function showSessionWarning() {
+        document.getElementById('sessionModal').classList.add('show');
+        
+        let warningSeconds = 60;
+        const warningInterval = setInterval(() => {
+            warningSeconds--;
+            document.getElementById('warningTime').textContent = warningSeconds;
+            
+            if (warningSeconds <= 0) {
+                clearInterval(warningInterval);
+                logout();
+            }
+        }, 1000);
+    }
+
+    function extendSession() {
+        // Hide modal
+        document.getElementById('sessionModal').classList.remove('show');
+        
+        // Reset timers
+        clearTimeout(sessionTimer);
+        clearTimeout(warningTimer);
+        
+        // Update session expiry
+        const newExpiry = Date.now() + SESSION_TIMEOUT;
+        localStorage.setItem('sessionExpiry', newExpiry);
+        
+        // Restart timers
+        startSessionTimer();
+        
+        showStatus('Session extended for another 30 minutes', 'success');
+    }
+
+    // Activity Monitoring
+    function setupActivityMonitoring() {
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+            document.addEventListener(event, () => {
+                const now = Date.now();
+                // Only reset if more than 1 minute since last activity
+                if (now - lastActivity > 60000) {
+                    lastActivity = now;
+                    // Could implement auto-extend here if needed
+                }
+            }, true);
+        });
+    }
+
+    // Logout Function
+    async function logout() {
+        const token = localStorage.getItem('adminToken');
+        
+        // Clear timers
+        clearTimeout(sessionTimer);
+        clearTimeout(warningTimer);
+        clearInterval(sessionCountdown);
+        
+        // Call logout API
+        if (token) {
+            try {
+                await fetch(`${API_BASE_URL}/auth/logout`, { // ✅ FIXED: API_BASE_URL
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
+        // Clear local storage
+        localStorage.clear();
+        
+        // Redirect to login
+        window.location.href = 'login.html'; // ✅ FIXED: Relative path
+    }
+
+    // Setup file upload (existing code)
+    function setupFileUpload() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        document.getElementById('documentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await processDocument();
+        });
+    }
+
+    // Add Authorization header to all API calls
+    async function authenticatedFetch(url, options = {}) {
+        const token = localStorage.getItem('adminToken');
+        
+        if (!token) {
+            window.location.href = 'login.html'; // ✅ FIXED: Relative path
+            return;
+        }
+        
+        options.headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        };
+        
+        const response = await fetch(url, options);
+        
+        // If unauthorized, redirect to login
+        if (response.status === 401 || response.status === 403) {
+            localStorage.clear();
+            window.location.href = 'login.html'; // ✅ FIXED: Relative path
+            return;
+        }
+        
+        return response;
+    }
+
+    // File handling (existing code)
+    function handleFile(file) {
+        const allowedTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'image/jpeg',
+            'image/jpg',
+            'image/png'
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            showStatus('Please upload a PDF, Word document, or image file', 'error');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            showStatus('File size must be less than 10MB', 'error');
+            return;
+        }
+        
+        currentFile = file;
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.innerHTML = `
+            <p>✅ ${file.name}</p>
+            <small>${(file.size / (1024 * 1024)).toFixed(2)} MB</small>
+            <br><small style="color: #10b981;">File ready for processing</small>
+        `;
+    }
+
+    // Process document with authentication
+    async function processDocument() {
+        if (!currentFile) {
+            showStatus('Please upload a document', 'error');
+            return;
+        }
+        
+        const processBtn = document.getElementById('processBtn');
+        processBtn.disabled = true;
+        processBtn.innerHTML = '<div class="loading"></div> Processing...';
+        
+        showStatus('Processing document and embedding QR code...', 'info');
+        
+        const formData = new FormData();
+        formData.append('document', currentFile);
+        formData.append('student_name', document.getElementById('studentName').value); // ✅ FIXED: snake_case
+        formData.append('student_id', document.getElementById('studentId').value); // ✅ FIXED: snake_case
+        formData.append('program', document.getElementById('program').value);
+        formData.append('document_type', document.getElementById('documentType').value); // ✅ FIXED: snake_case
+        
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/documents/process`, { // ✅ FIXED: API_BASE_URL
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                processedDocument = result;
+                showStatus('Document processed successfully! QR code embedded.', 'success');
+                
+                // Show preview
+                showPreview(result.previewUrl);
+                
+                // Show finalize section
+                document.getElementById('finalizeSection').style.display = 'block';
+            } else {
+                showStatus(result.error || 'Failed to process document', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showStatus('Error connecting to server. Please check if the backend is running.', 'error');
+        } finally {
+            processBtn.disabled = false;
+            processBtn.innerHTML = 'Process Document';
+        }
+    }
+
+    function showPreview(url) {
+        document.getElementById('previewPlaceholder').style.display = 'none';
+        document.getElementById('previewContent').style.display = 'block';
+        document.getElementById('documentPreview').src = url;
+    }
+
+    // Finalize document with authentication
+    async function finalizeDocument() {
+        if (!processedDocument) {
+            showStatus('No document to finalize', 'error');
+            return;
+        }
+        
+        const finalizeBtn = document.getElementById('finalizeBtn');
+        finalizeBtn.disabled = true;
+        finalizeBtn.innerHTML = '<div class="loading"></div> Registering...';
+        
+        showStatus('Registering document on blockchain...', 'info');
+        
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/documents/finalize`, { // ✅ FIXED: API_BASE_URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    document_hash: processedDocument.document_hash, // ✅ FIXED: snake_case
+                    documentData: processedDocument.documentData
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                showStatus('Document successfully registered on blockchain!', 'success');
+                
+                // Show blockchain transaction info
+                const blockchainStatus = document.getElementById('blockchainStatus');
+                const transactionInfo = document.getElementById('transactionInfo');
+
+                document.getElementById('documentInfo').classList.add('show');
+                
+                transactionInfo.innerHTML = `
+                    <strong>Transaction Hash:</strong><br>
+                    ${result.transactionHash}<br><br>
+                    <strong>Block Number:</strong><br>
+                    ${result.block_number}<br><br> <!-- ✅ FIXED: snake_case -->
+                    <strong>Status:</strong> Confirmed ✓
+                `;
+                
+                blockchainStatus.classList.add('show');
+                
+                // Disable finalize button since it's done
+                finalizeBtn.innerHTML = '✓ Registered on Blockchain';
+                finalizeBtn.style.background = '#10b981';
+
+                // Show download and print buttons
+document.getElementById('downloadBtn').style.display = 'inline-flex';
+document.getElementById('printBtn').style.display = 'inline-flex';
+                
+            } else {
+                showStatus(result.error || 'Failed to register on blockchain', 'error');
+                finalizeBtn.disabled = false;
+                finalizeBtn.innerHTML = '✓ Register on Blockchain';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showStatus('Error connecting to blockchain service', 'error');
+            finalizeBtn.disabled = false;
+            finalizeBtn.innerHTML = '✓ Register on Blockchain';
+        }
+    }
+
+    // Existing utility functions
+    function downloadDocument() {
+        if (!processedDocument) {
+            showStatus('No document to download', 'error');
+            return;
+        }
+        
+        const link = document.createElement('a');
+        link.href = processedDocument.downloadUrl;
+        link.download = `${processedDocument.documentData.studentName}_${processedDocument.documentData.documentType}_verified.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showStatus('Document download started', 'success');
+    }
+
+    function printDocument() {
+        if (!processedDocument) {
+            showStatus('No document to print', 'error');
+            return;
+        }
+        
+        const printWindow = window.open(processedDocument.previewUrl, '_blank');
+        printWindow.onload = function() {
+            printWindow.print();
+        };
+    }
+
+    function resetForm() {
+        // Reset form
+        document.getElementById('documentForm').reset();
+        
+        // Reset file upload area
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.innerHTML = `
+            <p>📁 Drop file here or click to browse</p>
+            <small>PDF, Word, or Image files (max 10MB)</small>
+        `;
+        
+        // Hide sections
+        document.getElementById('previewPlaceholder').style.display = 'block';
+        document.getElementById('previewContent').style.display = 'none';
+        document.getElementById('finalizeSection').style.display = 'none';
+        document.getElementById('documentInfo').classList.remove('show');
+        document.getElementById('blockchainStatus').classList.remove('show');
+        
+        // Hide status
+        document.getElementById('status').classList.remove('show');
+        
+        // Reset variables
+        currentFile = null;
+        processedDocument = null;
+        
+        // Reset buttons
+        const processBtn = document.getElementById('processBtn');
+        processBtn.disabled = false;
+        processBtn.innerHTML = 'Process Document';
+
+        // Hide download and print buttons
+document.getElementById('downloadBtn').style.display = 'none';
+document.getElementById('printBtn').style.display = 'none';
+        
+        const finalizeBtn = document.getElementById('finalizeBtn');
+        finalizeBtn.disabled = false;
+        finalizeBtn.innerHTML = '✓ Register on Blockchain';
+        finalizeBtn.style.background = '#10b981';
+        
+        // Clear saved form data
+        sessionStorage.removeItem('formData');
+    }
+
+    function showStatus(message, type) {
+        const status = document.getElementById('status');
+        status.textContent = message;
+        status.className = `status show ${type}`;
+        
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 5000);
+        }
+    }
+
+    // Error handling for iframe load failures
+    window.addEventListener('message', function(e) {
+        if (e.data === 'iframe-load-error') {
+            showStatus('Error loading document preview', 'error');
+        }
+    });
+
+    // Prevent unauthorized access via back button
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            // Page was loaded from cache (back button)
+            verifyToken();
+        }
+    });
+
+    // Auto-save form data to prevent loss on accidental refresh
+    function autoSaveForm() {
+        const formData = {
+            studentName: document.getElementById('studentName').value,
+            studentId: document.getElementById('studentId').value,
+            program: document.getElementById('program').value,
+            documentType: document.getElementById('documentType').value
+        };
+        sessionStorage.setItem('formData', JSON.stringify(formData));
+    }
+
+    // Restore form data if exists
+    function restoreFormData() {
+        const savedData = sessionStorage.getItem('formData');
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            document.getElementById('studentName').value = formData.studentName || '';
+            document.getElementById('studentId').value = formData.studentId || '';
+            document.getElementById('program').value = formData.program || '';
+            document.getElementById('documentType').value = formData.documentType || '';
+        }
+    }
+
+    // Auto-save form every 10 seconds
+    setInterval(autoSaveForm, 10000);
+</script>
+</body>
+</html>

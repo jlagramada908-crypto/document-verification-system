@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Verification Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .verification-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .method-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .method-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .method-card.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .method-icon {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .method-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .method-description {
+            text-align: center;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .verification-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .verification-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* QR Scanner Styles */
+        .qr-scanner {
+            text-align: center;
+        }
+
+        .mirror-camera {
+    transform: scaleX(-1);
+}
+
+.scanner-container.mirrored {
+    transform: scaleX(-1);
+}
+
+        .scanner-container {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px auto;
+            max-width: 400px;
+            position: relative;
+        }
+
+        #qr-video {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .scanner-corners {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+        }
+
+        .scanner-corners::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: #667eea;
+        }
+
+        .scanner-corners::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 100%;
+            background: #667eea;
+        }
+
+        .corner-tl { top: -3px; left: -3px; }
+        .corner-tr { top: -3px; right: -3px; transform: rotate(90deg); }
+        .corner-bl { bottom: -3px; left: -3px; transform: rotate(270deg); }
+        .corner-br { bottom: -3px; right: -3px; transform: rotate(180deg); }
+
+        .scanner-status {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        /* Upload Verification Styles */
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafbfc;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Document Information Display */
+        .document-info-section {
+            display: none;
+            margin-top: 30px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .document-info-section.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .document-display {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .document-details {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-group {
+            margin-bottom: 20px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            font-size: 16px;
+            color: #111827;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .document-viewer {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .viewer-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .viewer-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            color: #6b7280;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #dc2626;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #10b981;
+        }
+
+        .blockchain-info {
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .blockchain-details {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            line-height: 1.6;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.7);
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .hash-display {
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+        }
+
+        .security-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        #document-frame {
+     width: 100%;
+    height: 600px;
+     border: 1px solid #e5e7eb;
+   border-radius: 8px;
+    background: white;
+ }
+
+        @media (max-width: 768px) {
+            .verification-methods {
+                grid-template-columns: 1fr;
+            }
+            
+            .document-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .viewer-controls {
+                flex-direction: column;
+            }
+        }
+
+        .method-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .camera-permission {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Document Verification Portal</h1>
+            <p class="subtitle">Verify the authenticity of academic documents using QR codes or file upload</p>
+        </div>
+
+        <!-- Verification Method Selection -->
+        <div class="verification-methods">
+            <div class="method-card" id="qr-method" onclick="selectMethod('qr')">
+                <div class="method-icon">📱</div>
+                <div class="method-title">QR Code Scanner</div>
+                <div class="method-description">Scan QR codes from printed documents using your camera</div>
+            </div>
+            
+            <div class="method-card" id="upload-method" onclick="selectMethod('upload')">
+                <div class="method-icon">📄</div>
+                <div class="method-title">Upload Document</div>
+                <div class="method-description">Upload a digital document file to verify its authenticity</div>
+            </div>
+        </div>
+
+  <div id="qr-section" class="verification-section">
+    <div class="qr-scanner">
+        <h3>📱 QR Code Scanner</h3>
+        <p style="margin: 15px 0; color: #666;">Position the QR code from your printed document within the scanning area</p>
+        
+        <div class="scanner-container" id="scanner-container" style="display: none;">
+            <video id="qr-video" autoplay muted playsinline></video>
+            <div class="scanner-overlay">
+                <div class="scanner-corners corner-tl"></div>
+                <div class="scanner-corners corner-tr"></div>
+                <div class="scanner-corners corner-bl"></div>
+                <div class="scanner-corners corner-br"></div>
+            </div>
+            <div class="scanner-status" id="scanner-status">
+                Searching for QR code...
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="startQRScanner()" id="start-scanner-btn">
+                📷 Start Scanner
+            </button>
+            <button class="btn btn-secondary" onclick="stopQRScanner()" id="stop-scanner-btn" style="display: none;">
+                ⏹️ Stop Scanner
+            </button>
+            <!-- Camera Control Buttons -->
+            <button class="btn btn-secondary" onclick="switchCamera()" id="switch-camera-btn" style="display: none;">
+                🔄 Switch Camera
+            </button>
+    
+        </div>
+        
+        <!-- Add error message area -->
+        <div id="scanner-error" style="display: none; margin-top: 15px; padding: 10px; background: #fee2e2; color: #dc2626; border-radius: 6px; text-align: center;">
+            <p id="scanner-error-message"></p>
+            <button class="btn btn-primary" onclick="startQRScanner()" style="margin-top: 10px;">
+                Try Again
+            </button>
+        </div>
+    </div>
+</div>
+
+        <!-- Upload Verification Section -->
+        <div id="upload-section" class="verification-section">
+            <div class="upload-verification">
+                <h3>📄 Document Upload Verification</h3>
+                <p style="margin: 15px 0; color: #666;">Upload a document file to verify its authenticity and integrity</p>
+                
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drop document here or click to browse</div>
+                    <div class="upload-hint">Supports PDF, Word documents, and images</div>
+                    <input type="file" id="file-input" hidden accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                </div>
+                
+                <div id="upload-status" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Document Information Display (for both methods) -->
+        <div id="document-info-section" class="document-info-section">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #374151; margin-bottom: 10px;">✅ Document Verified</h2>
+                <p style="color: #6b7280;">The following document has been successfully verified</p>
+            </div>
+            
+            <div class="document-display">
+                <div class="document-details">
+                    <h3 style="margin-bottom: 20px; color: #374151;">📋 Document Information</h3>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Student Name</div>
+                        <div class="detail-value" id="display-student-name"></div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Student ID</div>
+                        <div class="detail-value" id="display-student-id"></div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Program</div>
+                        <div class="detail-value" id="display-program"></div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Document Type</div>
+                        <div class="detail-value" id="display-document-type"></div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Date Issued</div>
+                        <div class="detail-value" id="display-date-issued"></div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Verification Status</div>
+                        <div class="detail-value">
+                            <span id="display-verification-status" class="status-badge"></span>
+                            <span id="display-security-badge" class="security-badge" style="display: none;">
+                                🛡️ SECURE
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="detail-group">
+                        <div class="detail-label">Document Hash</div>
+                        <div class="detail-value">
+                            <div id="display-document-hash" class="hash-display"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="display-blockchain-info" class="blockchain-info" style="display: none;">
+                        <strong>🔗 Blockchain Verification:</strong>
+                        <div id="display-blockchain-details" class="blockchain-details"></div>
+                    </div>
+                </div>
+                
+                <div class="document-viewer">
+                    <div class="viewer-header">
+                        <div class="viewer-title">📄 Original Document (View Only)</div>
+                        <div class="viewer-controls">
+                            <button class="btn btn-secondary" onclick="openFullscreen()" id="fullscreen-btn">
+                                🔍 Fullscreen
+                            </button>
+                            <a href="#" class="btn btn-primary" id="new-window-btn" target="_blank" style="display: none;">
+                                🔗 New Window
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div id="document-viewer-container">
+                        <iframe id="document-frame" src="" title="Document Viewer" sandbox="allow-same-origin allow-scripts"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading and Error States -->
+        <div id="loading-section" class="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Verifying document authenticity...</p>
+        </div>
+
+        <div id="error-section" class="error" style="display: none;">
+            <h3>⚠️ Verification Failed</h3>
+            <p id="error-message"></p>
+        </div>
+    </div>
+
+    <!-- QR Code Scanner Library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    
+    <script>
+    const API_BASE_URL = window.location.origin + '/api'; // ✅ FIXED: Consistent variable name
+    let qrScanner = null;
+    let scannerActive = false;
+    let currentDocumentHash = '';
+    let currentStream = null;
+    let currentFacingMode = 'user';
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if we have a document hash in the URL (direct QR scan)
+        const urlParts = window.location.pathname.split('/');
+        const possibleHash = urlParts[urlParts.length - 1];
+        
+        if (possibleHash && possibleHash !== 'verify' && possibleHash.startsWith('0x')) {
+            // Direct QR scan - show document info immediately
+            currentDocumentHash = possibleHash;
+            verifyDocumentByHash(possibleHash);
+        } else {
+            // Show method selection
+            setupEventListeners();
+        }
+    });
+
+    function setupEventListeners() {
+        // Upload area events
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+    }
+
+    function selectMethod(method) {
+    // Update UI
+    document.querySelectorAll('.method-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.verification-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    document.getElementById(`${method}-method`).classList.add('active');
+    document.getElementById(`${method}-section`).classList.add('active');
+    
+    if (method === 'qr') {
+        checkCameraSupport(); // ✅ ADD THIS
+    }
+}
+
+    // Camera state variables
+ // 'user' for front, 'environment' for rear
+
+// Enhanced QR Scanner with mirroring and camera switching
+async function startQRScanner() {
+    try {
+        const video = document.getElementById('qr-video');
+        
+        // Stop any existing stream
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+        
+        const constraints = {
+            video: { 
+                facingMode: currentFacingMode,
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        };
+        
+        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = currentStream;
+        
+        // Apply mirroring based on camera and user preference
+        updateMirroring();
+        
+        // Show scanner and update UI
+        document.getElementById('scanner-container').style.display = 'block';
+        document.getElementById('scanner-error').style.display = 'none';
+        updateScannerButtons(false, true); // Hide start, show stop
+        
+        // Show camera control buttons
+        document.getElementById('switch-camera-btn').style.display = 'inline-block';
+        
+        
+        scannerActive = true;
+        scanQRCode();
+        
+    } catch (error) {
+        console.error('Camera access error:', error);
+        
+        // Try opposite camera if one fails
+        if (currentFacingMode === 'user') {
+            currentFacingMode = 'environment';
+            startQRScanner(); // Retry with rear camera
+            return;
+        } else if (currentFacingMode === 'environment') {
+            currentFacingMode = 'user';
+            startQRScanner(); // Retry with front camera
+            return;
+        }
+        
+        // Show error message if all attempts fail
+        document.getElementById('scanner-error').style.display = 'block';
+        document.getElementById('scanner-error-message').textContent = 
+            'Camera access denied. Please allow camera access to scan QR codes.';
+        
+        // Reset UI
+        document.getElementById('scanner-container').style.display = 'none';
+        updateScannerButtons(true, false);
+        document.getElementById('switch-camera-btn').style.display = 'none';
+        document.getElementById('mirror-toggle-btn').style.display = 'none';
+    }
+}
+
+function stopQRScanner() {
+    scannerActive = false;
+    
+    // Stop the camera stream
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+    }
+    
+    // Reset video element
+    const video = document.getElementById('qr-video');
+    video.srcObject = null;
+    video.style.transform = 'scaleX(1)'; // Reset transform
+    
+    // Reset UI
+    document.getElementById('scanner-container').style.display = 'none';
+    document.getElementById('scanner-error').style.display = 'none';
+    updateScannerButtons(true, false); // Show start, hide stop
+    
+    // Hide camera control buttons
+    document.getElementById('switch-camera-btn').style.display = 'none';
+    
+}
+
+// Switch between front and rear cameras
+async function switchCamera() {
+    if (!scannerActive) return;
+    
+    try {
+        // Toggle camera facing mode
+        currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+        
+        // Restart scanner with new camera
+        await startQRScanner();
+        
+    } catch (error) {
+        console.error('Error switching camera:', error);
+        document.getElementById('scanner-error').style.display = 'block';
+        document.getElementById('scanner-error-message').textContent = 
+            'Failed to switch camera. Please try again.';
+    }
+}
+
+
+
+// Update mirroring based on current camera and user preference
+function updateMirroring() {
+    const video = document.getElementById('qr-video');
+    
+    // Always mirror front camera, never mirror rear camera
+    if (currentFacingMode === 'user') {
+        video.style.transform = 'scaleX(-1)';
+    } else {
+        video.style.transform = 'scaleX(1)';
+    }
+}
+
+
+
+// Button management helper
+function updateScannerButtons(startVisible, stopVisible) {
+    document.getElementById('start-scanner-btn').style.display = 
+        startVisible ? 'inline-block' : 'none';
+    document.getElementById('stop-scanner-btn').style.display = 
+        stopVisible ? 'inline-block' : 'none';
+}
+
+// QR scanning function
+function scanQRCode() {
+    const video = document.getElementById('qr-video');
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    
+    function scan() {
+        if (!scannerActive) return;
+        
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            
+            if (code) {
+                document.getElementById('scanner-status').textContent = 'QR Code detected!';
+                handleQRCodeScan(code.data);
+                stopQRScanner();
+                return;
+            }
+        }
+        
+        requestAnimationFrame(scan);
+    }
+    
+    scan();
+}
+
+// Camera support check
+function checkCameraSupport() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('qr-method').classList.add('disabled');
+        document.getElementById('scanner-error').style.display = 'block';
+        document.getElementById('scanner-error-message').textContent = 
+            'Camera not supported. Please use a different browser or device that supports camera access.';
+        updateScannerButtons(false, false);
+    } else {
+        document.getElementById('scanner-error').style.display = 'none';
+        updateScannerButtons(true, false);
+    }
+}
+
+    function handleQRCodeScan(data) {
+        console.log('QR Code scanned:', data);
+
+        if (!data || typeof data !== 'string' || data.trim() === '') {
+        console.log('Invalid QR code data, ignoring');
+        return; // Ignore invalid data
+    }
+        
+        // Check if it's a verification URL
+        if (data.includes('/verify/')) {
+            const hash = data.split('/verify/')[1];
+            if (hash) {
+                currentDocumentHash = hash;
+                verifyDocumentByHash(hash);
+            } else {
+                showError('Invalid QR code format');
+            }
+        } else {
+            showError('This QR code is not a valid document verification code');
+        }
+    }
+
+    // File Upload Functions
+    function handleFileUpload(file) {
+        const allowedTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'image/jpeg',
+            'image/jpg',
+            'image/png'
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            showError('Please upload a PDF, Word document, or image file');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            showError('File size must be less than 10MB');
+            return;
+        }
+
+        verifyUploadedDocument(file);
+    }
+
+    async function verifyUploadedDocument(file) {
+        showLoading('Analyzing and verifying document integrity...');
+        
+        const formData = new FormData();
+        formData.append('document', file);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/verify/upload`, { // ✅ FIXED: API_BASE_URL
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            console.log('Verification result:', result);
+            
+            if (response.ok) {
+                if (result.verificationStatus === 'NOT_FOUND') {
+                    showError(result.error || 'Document not found in verification database');
+                } else if (result.verificationStatus === 'TAMPERED') {
+                    // Document found but tampered
+                    showTamperedWarning(result);
+                } else if (result.verificationStatus === 'AUTHENTIC') {
+                    // Document is authentic
+                    showAuthenticDocument(result);
+                } else {
+                    displayDocumentInfo(result.document);
+                }
+            } else {
+                showError(result.error || 'Document verification failed');
+            }
+        } catch (error) {
+            console.error('Upload verification error:', error);
+            showError('Failed to verify uploaded document');
+        }
+    }
+
+    function showTamperedWarning(result) {
+        hideAllSections();
+        
+        const container = document.querySelector('.container');
+        
+        // Remove any existing warning
+        const existingWarning = document.getElementById('tamper-warning');
+        if (existingWarning) existingWarning.remove();
+        
+        const warningHTML = `
+            <div id="tamper-warning" class="tamper-warning" style="
+                background: linear-gradient(135deg, #FEE2E2 0%, #FCA5A5 100%);
+                border: 2px solid #DC2626;
+                border-radius: 12px;
+                padding: 30px;
+                margin: 20px 0;
+                box-shadow: 0 4px 6px rgba(220, 38, 38, 0.1);
+            ">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+                    <h2 style="color: #B91C1C; margin-bottom: 10px;">DOCUMENT TAMPERING DETECTED</h2>
+                    <p style="color: #7F1D1D; font-weight: 500;">This document has been modified from its original verified version</p>
+                </div>
+                
+                <div style="background: white; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #991B1B; margin-bottom: 15px;">🔍 Integrity Check Results:</h3>
+                    
+                    <div style="display: grid; gap: 15px;">
+                        <div class="detail-group">
+                            <div class="detail-label">Verification Status</div>
+                            <div class="detail-value">
+                                <span style="background: #DC2626; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold;">
+                                    ${result.verificationStatus}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        ${result.integrity.sizeMatch !== undefined ? `
+                        <div class="detail-group">
+                            <div class="detail-label">File Size Analysis</div>
+                            <div class="detail-value">
+                                Uploaded: ${formatFileSize(result.integrity.uploadedSize)} | 
+                                Expected: ${formatFileSize(result.integrity.expectedSize)}
+                                ${!result.integrity.sizeMatch ? ' <span style="color: #DC2626;">❌ MISMATCH</span>' : ''}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <div style="background: #FEF2F2; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #991B1B; margin-bottom: 15px;">📋 Original Document Information:</h3>
+                    <p style="color: #7F1D1D; margin-bottom: 10px;">The following information is from the original, unmodified document:</p>
+                    
+                    <div style="display: grid; gap: 10px; margin-top: 15px;">
+                        <div><strong>Student:</strong> ${result.document.studentName}</div>
+                        <div><strong>Student ID:</strong> ${result.document.studentId}</div>
+                        <div><strong>Program:</strong> ${result.document.program}</div>
+                        <div><strong>Document Type:</strong> ${result.document.documentType}</div>
+                        <div><strong>Original Issue Date:</strong> ${new Date(result.document.dateIssued).toLocaleDateString()}</div>
+                        <div><strong>Original Hash:</strong> <code style="background: #FEE2E2; padding: 2px 6px; border-radius: 4px; font-size: 12px;">${result.document.documentHash}</code></div>
+                    </div>
+                </div>
+                
+                <div style="background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 8px; padding: 15px; margin-top: 20px;">
+                    <p style="color: #991B1B; margin: 0; font-weight: 500;">
+                        ⚠️ <strong>Warning:</strong> This document should not be accepted as valid. 
+                        Only accept documents that pass integrity verification.
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="location.reload()">
+                        🔄 Verify Another Document
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', warningHTML);
+    }
+
+    function showAuthenticDocument(result) {
+        hideAllSections();
+        
+        const container = document.querySelector('.container');
+        
+        // Remove any existing success message
+        const existingSuccess = document.getElementById('authentic-success');
+        if (existingSuccess) existingSuccess.remove();
+        
+        const successHTML = `
+            <div id="authentic-success" class="authentic-success" style="
+                background: linear-gradient(135deg, #D1FAE5 0%, #6EE7B7 100%);
+                border: 2px solid #10B981;
+                border-radius: 12px;
+                padding: 30px;
+                margin: 20px 0;
+                box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+            ">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
+                    <h2 style="color: #065F46; margin-bottom: 10px;">DOCUMENT VERIFIED AS AUTHENTIC</h2>
+                    <p style="color: #047857; font-weight: 500;">${result.integrity.message}</p>
+                </div>
+                
+                <div style="background: white; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #065F46; margin-bottom: 15px;">🔒 Integrity Verification Results:</h3>
+                    
+                    <div style="display: grid; gap: 15px;">
+                        <div class="detail-group">
+                            <div class="detail-label">Verification Status</div>
+                            <div class="detail-value">
+                                <span style="background: #10B981; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold;">
+                                    AUTHENTIC ✓
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <div class="detail-label">Integrity Check</div>
+                            <div class="detail-value" style="color: #059669; font-weight: 500;">
+                                Document has not been modified
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        
+                    </div>
+                </div>
+                
+                <div id="authentic-document-info"></div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="displayFullDocumentInfo(${JSON.stringify(result.document).replace(/"/g, '&quot;')})">
+                        📄 View Full Document Details
+                    </button>
+                    <button class="btn btn-secondary" onclick="location.reload()" style="margin-left: 10px;">
+                        🔄 Verify Another Document
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', successHTML);
+    }
+
+    function displayFullDocumentInfo(docData) {
+        // Hide the success message and show the full document info
+        document.getElementById('authentic-success').style.display = 'none';
+        displayDocumentInfo(docData);
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // Document Verification Functions
+    async function verifyDocumentByHash(documentHash) {
+        showLoading('Verifying document from QR code...');
+        
+        try {
+            console.log('Fetching document with hash:', documentHash);
+            const response = await fetch(`${API_BASE_URL}/verify/${documentHash}`); // ✅ FIXED: API_BASE_URL
+            
+            if (!response.ok) {
+                const errorData = await response.text();
+                console.error('Server response:', errorData);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            console.log('Verification result:', result);
+            
+            if (result.success) {
+                displayDocumentInfo(result.document);
+            } else {
+                showError(result.error || result.message || 'Document not found');
+            }
+        } catch (error) {
+            console.error('Verification error:', error);
+            if (error.message.includes('404')) {
+                showError('Document not found in verification database. Please ensure this QR code is from a verified document.');
+            } else if (error.message.includes('Failed to fetch')) {
+                showError('Cannot connect to verification server. Please check your internet connection.');
+            } else {
+                showError(`Verification failed: ${error.message}`);
+            }
+        }
+    }
+
+    function displayDocumentInfo(docData) {
+        hideAllSections();
+        document.getElementById('document-info-section').classList.add('show');
+        
+        // Fill in document details
+        document.getElementById('display-student-name').textContent = docData.studentName;
+        document.getElementById('display-student-id').textContent = docData.studentId;
+        document.getElementById('display-program').textContent = docData.program;
+        document.getElementById('display-document-type').textContent = docData.documentType;
+        document.getElementById('display-date-issued').textContent = new Date(docData.dateIssued).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        document.getElementById('display-document-hash').textContent = docData.documentHash;
+        
+        // Show verification status
+        const statusElement = document.getElementById('display-verification-status');
+        const securityBadge = document.getElementById('display-security-badge');
+        
+        if (docData.verified && docData.blockchainTxHash) {
+            statusElement.textContent = '✅ Verified on Blockchain';
+            statusElement.className = 'status-badge status-verified';
+            securityBadge.style.display = 'inline-flex';
+            
+            // Show blockchain info
+            const blockchainInfo = document.getElementById('display-blockchain-info');
+            const blockchainDetails = document.getElementById('display-blockchain-details');
+            blockchainDetails.innerHTML = `
+                <strong>Transaction Hash:</strong><br>
+                ${docData.blockchainTxHash}<br><br>
+                <strong>Block Number:</strong><br>
+                #${docData.blockNumber}<br><br>
+                <strong>Status:</strong> Confirmed ✅<br><br>
+                <strong>Timestamp:</strong><br>
+                ${new Date(docData.createdAt).toLocaleString()}
+            `;
+            blockchainInfo.style.display = 'block';
+        } else {
+            statusElement.textContent = '⏳ Pending Blockchain Verification';
+            statusElement.className = 'status-badge status-pending';
+        }
+        
+        // Load original document
+        loadOriginalDocument(docData.documentHash);
+        
+        // Update page title
+        document.title = `Verified: ${docData.studentName} - ${docData.documentType}`;
+    }
+
+    async function loadOriginalDocument(documentHash) {
+        const viewerContainer = document.getElementById('document-viewer-container');
+        const newWindowBtn = document.getElementById('new-window-btn');
+        
+        // Clear container
+        viewerContainer.innerHTML = '';
+        
+        const documentUrl = `${API_BASE_URL}/documents/view-protected/${documentHash}`; // ✅ FIXED: API_BASE_URL
+        
+        // Add view-only notice
+        const notice = document.createElement('div');
+        notice.style.cssText = `
+            background: linear-gradient(90deg, #fef3c7, #fde68a);
+            border: 1px solid #f59e0b;
+            border-radius: 8px 8px 0 0;
+            padding: 10px 15px;
+            font-size: 14px;
+            color: #92400e;
+            text-align: center;
+            font-weight: 500;
+        `;
+        notice.innerHTML = '🔒 <strong>VIEW ONLY MODE</strong> - Download, print, and text selection disabled';
+        
+        // Create container for PDF viewer with fullscreen support
+        const pdfContainer = document.createElement('div');
+        pdfContainer.id = 'pdf-viewer-container';
+        pdfContainer.style.cssText = `
+            width: 100%;
+            height: 600px;
+            border: 1px solid #f59e0b;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        `;
+        
+        // Loading message
+        pdfContainer.innerHTML = `
+            <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #6b7280;">
+                <div>
+                    <div style="font-size: 24px; margin-bottom: 10px;">📄</div>
+                    <div>Loading high-quality document viewer...</div>
+                </div>
+            </div>
+        `;
+        
+        viewerContainer.appendChild(notice);
+        viewerContainer.appendChild(pdfContainer);
+        
+        // Load PDF.js from CDN
+        if (!window.pdfjsLib) {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            document.head.appendChild(script);
+            
+            script.onload = () => {
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                renderHighQualityPDF(documentUrl, pdfContainer);
+            };
+            
+            script.onerror = () => {
+                pdfContainer.innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: #ef4444;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">❌</div>
+                        <div>Failed to load PDF viewer</div>
+                    </div>
+                `;
+            };
+        } else {
+            renderHighQualityPDF(documentUrl, pdfContainer);
+        }
+        
+        // Disable new window button
+        newWindowBtn.textContent = '🔒 Protected';
+        newWindowBtn.style.background = '#9ca3af';
+        newWindowBtn.style.cursor = 'not-allowed';
+        newWindowBtn.onclick = function(e) {
+            e.preventDefault();
+            showViewOnlyNotification('This document is view-only and cannot be downloaded.');
+            return false;
+        };
+        newWindowBtn.removeAttribute('href');
+        newWindowBtn.style.display = 'inline-flex';
+    }
+
+    async function renderHighQualityPDF(documentUrl, container) {
+        try {
+            // Load the PDF document
+            const loadingTask = window.pdfjsLib.getDocument(documentUrl);
+            const pdf = await loadingTask.promise;
+            
+            // Clear loading message
+            container.innerHTML = '';
+            
+            // Create scrollable container for pages
+            const scrollContainer = document.createElement('div');
+            scrollContainer.id = 'pdf-scroll-container';
+            scrollContainer.style.cssText = `
+                height: 100%;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 20px;
+                background: #f8fafc;
+            `;
+            
+            container.appendChild(scrollContainer);
+            
+            // Render each page with higher quality
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                const page = await pdf.getPage(pageNum);
+                
+                // Calculate scale to fit container width (use higher DPI multiplier)
+                const baseScale = Math.min(1.5, (container.offsetWidth - 80) / page.getViewport({ scale: 1 }).width);
+                const renderScale = baseScale * 2; // Render at 2x resolution for clarity
+                const viewport = page.getViewport({ scale: renderScale });
+                
+                // Create canvas for this page
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                
+                // Set canvas dimensions to higher resolution
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                // Use CSS to scale down to original intended size
+                const displayScale = baseScale / renderScale;
+                canvas.style.cssText = `
+                    display: block;
+                    margin: 0 auto 20px auto;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    border-radius: 4px;
+                    background: white;
+                    max-width: 100%;
+                    height: auto;
+                    width: ${baseScale * page.getViewport({ scale: 1 }).width}px;
+                    image-rendering: -webkit-optimize-contrast;
+                    image-rendering: crisp-edges;
+                    image-rendering: pixelated;
+                `;
+                
+                // Apply protection
+                canvas.style.userSelect = 'none';
+                canvas.style.webkitUserSelect = 'none';
+                canvas.style.mozUserSelect = 'none';
+                canvas.style.msUserSelect = 'none';
+                
+                // Add page number attribute for reference
+                canvas.setAttribute('data-page', pageNum);
+                
+                // Disable right-click - Use capture phase to ensure it fires
+                canvas.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showViewOnlyNotification('Right-click disabled on view-only document');
+                    return false;
+                }, true); // Add true for capture phase
+                
+                // Disable drag
+                canvas.addEventListener('dragstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                });
+                
+                // Add additional event listeners for comprehensive protection
+                canvas.addEventListener('selectstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                });
+                
+                canvas.addEventListener('copy', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showViewOnlyNotification('Copying disabled on view-only document');
+                    return false;
+                });
+                
+                canvas.addEventListener('cut', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showViewOnlyNotification('Cutting disabled on view-only document');
+                    return false;
+                });
+                
+                // Make canvas non-focusable to prevent keyboard events
+                canvas.tabIndex = -1;
+                canvas.style.outline = 'none';
+                
+                // Render PDF page to canvas with higher resolution
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport,
+                    enableWebGL: true, // Enable hardware acceleration
+                    improveTextAccuracy: true
+                };
+                
+                await page.render(renderContext).promise;
+                scrollContainer.appendChild(canvas);
+                
+                // Optional: Add protective wrapper for extra security
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.style.display = 'inline-block';
+                
+                // Add protective overlay that only allows left-click
+                const overlay = document.createElement('div');
+                overlay.style.position = 'absolute';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.width = '100%';
+                overlay.style.height = '100%';
+                overlay.style.zIndex = '2';
+                overlay.style.cursor = 'default';
+                
+                // Add event listeners to overlay
+                overlay.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showViewOnlyNotification('Right-click disabled on view-only document');
+                    return false;
+                }, true);
+                
+                overlay.addEventListener('dragstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }, true);
+                
+                overlay.addEventListener('selectstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }, true);
+                
+                // Move canvas into wrapper and add overlay
+                wrapper.appendChild(canvas);
+                wrapper.appendChild(overlay);
+                scrollContainer.appendChild(wrapper);
+            }
+            
+            // Add page info and instructions
+            const pageInfo = document.createElement('div');
+            pageInfo.style.cssText = `
+                text-align: center;
+                padding: 20px;
+                color: #6b7280;
+                font-size: 14px;
+            `;
+            pageInfo.innerHTML = `
+                <div>Document rendered: ${pdf.numPages} page${pdf.numPages > 1 ? 's' : ''}</div>
+                <div style="font-size: 12px; margin-top: 5px; color: #9ca3af;">
+                    Click on any page to view in fullscreen
+                </div>
+            `;
+            scrollContainer.appendChild(pageInfo);
+            
+            // Add keyboard protection
+            document.addEventListener('keydown', handleSecurePDFKeydown);
+            
+        } catch (error) {
+            console.error('Error rendering PDF:', error);
+            container.innerHTML = `
+                <div style="text-align: center; padding: 50px; color: #ef4444;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">❌</div>
+                    <div>Error loading document</div>
+                    <div style="font-size: 12px; margin-top: 10px; color: #9ca3af;">
+                        ${error.message}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function openCanvasFullscreen(canvas) {
+        if (!canvas) {
+            console.error('Canvas element not found for fullscreen');
+            return;
+        }
+        
+        try {
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            } else {
+                // Fallback: Create modal overlay
+                createFullscreenModal(canvas);
+            }
+        } catch (error) {
+            console.error('Fullscreen error:', error);
+            createFullscreenModal(canvas);
+        }
+    }
+
+    // Fallback fullscreen modal
+    function createFullscreenModal(canvas) {
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.id = 'fullscreen-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        `;
+        
+        // Clone canvas for modal
+        const modalCanvas = canvas.cloneNode(true);
+        modalCanvas.style.cssText = `
+            max-width: 90%;
+            max-height: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            cursor: default;
+        `;
+        
+        // Close button
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '✕';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        `;
+        
+        closeBtn.addEventListener('mouseover', function() {
+            this.style.background = 'rgba(255, 255, 255, 0.3)';
+            this.style.transform = 'scale(1.1)';
+        });
+        
+        closeBtn.addEventListener('mouseout', function() {
+            this.style.background = 'rgba(255, 255, 255, 0.2)';
+            this.style.transform = 'scale(1)';
+        });
+        
+        // Close modal function
+        function closeModal() {
+            if (modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+            document.removeEventListener('keydown', modalKeyHandler);
+        }
+        
+        // Keyboard handler for modal
+        function modalKeyHandler(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        }
+        
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        document.addEventListener('keydown', modalKeyHandler);
+        
+        modal.appendChild(modalCanvas);
+        modal.appendChild(closeBtn);
+        document.body.appendChild(modal);
+    }
+
+    function handleSecurePDFKeydown(e) {
+        // Only apply when PDF viewer is active
+        if (!document.querySelector('#document-viewer-container canvas')) return;
+        
+        // Prevent common shortcuts
+        if ((e.ctrlKey || e.metaKey) && (
+            e.key === 's' ||  // Save
+            e.key === 'p' ||  // Print
+            e.key === 'a' ||  // Select All
+            e.key === 'c' ||  // Copy
+            e.key === 'v' ||  // Paste
+            e.key === 'x'     // Cut
+        )) {
+            e.preventDefault();
+            showViewOnlyNotification(`${e.key.toUpperCase()} shortcut disabled for view-only documents`);
+            return false;
+        }
+    }
+
+    function showViewOnlyNotification(message) {
+        // Remove existing notifications
+        const existing = document.querySelector('.view-only-notification');
+        if (existing) existing.remove();
+        
+        const notification = document.createElement('div');
+        notification.className = 'view-only-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #92400e;
+            font-size: 14px;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+        `;
+        
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px;">🔒</span>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }
+        }, 3000);
+    }
+
+    function openFullscreen() {
+        const firstCanvas = document.querySelector('#pdf-scroll-container canvas');
+        if (firstCanvas) {
+            openCanvasFullscreen(firstCanvas);
+        } else {
+            showViewOnlyNotification('Please wait for the document to load completely');
+        }
+    }
+
+    // Utility Functions
+    function showLoading(message) {
+        hideAllSections();
+        document.getElementById('loading-section').style.display = 'flex';
+        document.getElementById('loading-section').querySelector('p').textContent = message;
+    }
+
+    function showError(message) {
+        hideAllSections();
+        document.getElementById('error-section').style.display = 'block';
+        document.getElementById('error-message').textContent = message;
+        
+        // Add retry button for certain errors
+        const errorSection = document.getElementById('error-section');
+        if (!errorSection.querySelector('.retry-btn')) {
+            const retryBtn = document.createElement('button');
+            retryBtn.className = 'btn btn-primary retry-btn';
+            retryBtn.style.marginTop = '15px';
+            retryBtn.textContent = '🔄 Try Again';
+            retryBtn.onclick = () => {
+                location.reload();
+            };
+            errorSection.appendChild(retryBtn);
+        }
+    }
+
+    function hideAllSections() {
+        document.getElementById('loading-section').style.display = 'none';
+        document.getElementById('error-section').style.display = 'none';
+        document.getElementById('document-info-section').classList.remove('show');
+    }
+
+    // Add CSS animations
+    const viewOnlyStyles = `
+    <style>
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* Additional protection styles */
+    #document-viewer-container canvas {
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+        -webkit-user-drag: none !important;
+        -khtml-user-drag: none !important;
+        -moz-user-drag: none !important;
+        -o-user-drag: none !important;
+        user-drag: none !important;
+    }
+
+    /* Disable text selection on viewer container */
+    #document-viewer-container {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    /* Custom scrollbar for PDF container */
+    #document-viewer-container ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #document-viewer-container ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    #document-viewer-container ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    #document-viewer-container ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    </style>
+    `;
+
+    // Add styles to page
+    document.head.insertAdjacentHTML('beforeend', viewOnlyStyles);
+
+    // Clean up event listeners when leaving the page
+    window.addEventListener('beforeunload', function() {
+        document.removeEventListener('keydown', handleSecurePDFKeydown);
+    });
+
+    // Also add print protection specifically for the verification page
+    window.addEventListener('beforeprint', function(e) {
+        if (document.querySelector('#document-viewer-container canvas')) {
+            e.preventDefault();
+            showViewOnlyNotification('Printing is disabled for view-only documents');
+            return false;
+        }
+    });
+
+    // Handle browser navigation
+    window.addEventListener('popstate', function() {
+        // Check if we're going back to method selection
+        const urlParts = window.location.pathname.split('/');
+        const possibleHash = urlParts[urlParts.length - 1];
+        
+        if (!possibleHash || possibleHash === 'verify') {
+            // Back to main page
+            hideAllSections();
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelectorAll('.verification-section').forEach(section => {
+                section.classList.remove('active');
+            });
+        }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Escape key to stop scanner or go back
+        if (e.key === 'Escape') {
+            if (scannerActive) {
+                stopQRScanner();
+            } else if (document.getElementById('document-info-section').classList.contains('show')) {
+                hideAllSections();
+            }
+        }
+        
+        // F key to toggle fullscreen
+        if (e.key === 'f' || e.key === 'F') {
+            if (document.getElementById('document-info-section').classList.contains('show')) {
+                openFullscreen();
+            }
+        }
+    });
+
+    // Initialize enhanced features
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle offline status
+        window.addEventListener('offline', function() {
+            showError('You are offline. Please check your internet connection and try again.');
+        });
+        
+        window.addEventListener('online', function() {
+            if (document.getElementById('error-section').style.display !== 'none') {
+                location.reload();
+            }
+        });
+    });
+
+    // Prevent right-click on sensitive areas
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.closest('#document-frame') || e.target.closest('.hash-display')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Performance optimization for mobile
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                if (scannerActive) {
+                    // Restart scanner after orientation change
+                    stopQRScanner();
+                    setTimeout(() => startQRScanner(), 500);
+                }
+            }, 100);
+        });
+    }
+</script>
+</body>
+</html> 

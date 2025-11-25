@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure blockchain-based document verification system for academic institutions">
+    <title>Document Verification System - PRMSU</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px 20px 80px 20px;
+            gap: 10px;
+        }
+
+        .logo-container {
+            margin-bottom: 10px;
+        }
+
+        .university-name {
+            color: white;
+            font-size: 0.95em;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .shield-icon {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: float 3s ease-in-out infinite;
+            padding: 8px;
+        }
+
+        .shield-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .hero h1 {
+            color: white;
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .hero .subtitle {
+            color: rgba(255,255,255,0.95);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+
+        .hero .institution {
+            color: rgba(255,255,255,0.9);
+            font-size: 1em;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0,0,0,0.2);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Portal Cards */
+        .portals {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .portal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .portal-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .portal-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .portal-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .portal-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .portal-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Float Animation */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.5em;
+            }
+
+            .hero .subtitle {
+                font-size: 1em;
+            }
+
+            .portals {
+                grid-template-columns: 1fr;
+            }
+
+            .shield-icon {
+                width: 100px;
+                height: 100px;
+            }
+
+            .hero {
+                padding-bottom: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="logo-container">
+            <div class="shield-icon">
+                <img src="./images/President_Ramon_Magsaysay_State_University.png" alt="PRMSU Logo">
+            </div>
+            <p class="university-name">President Ramon Magsaysay State University</p>
+        </div>
+
+        <h1>Blockchain-Enabled Academic Document Verification System</h1>
+        <p class="subtitle">Secure, tamper-proof, and instant verification of academic records powered by blockchain technology.</p>
+        
+
+        <!-- Portal Cards -->
+        <div class="portals">
+            <!-- Verification Portal -->
+            <div class="portal-card" onclick="window.location.href='verify.html'">
+                <span class="portal-icon">🔍</span>
+                <h3 class="portal-title">Verify Documents</h3>
+                <p class="portal-description">
+                    Instantly verify academic documents using QR codes or file upload.
+                </p>
+                <a href="verify.html" class="portal-button">Start Verification</a>
+            </div>
+
+            <!-- Admin Portal -->
+            <div class="portal-card" onclick="window.location.href='login.html'">
+                <span class="portal-icon">🔐</span>
+                <h3 class="portal-title">Admin Portal</h3>
+                <p class="portal-description">
+                    Process and manage academic documents on the blockchain.
+                </p>
+                <a href="login.html" class="portal-button">Admin Login</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 PRMSU Document Verification System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Prevent double navigation when clicking button inside card
+        document.querySelectorAll('.portal-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
+</body>
+</html>
