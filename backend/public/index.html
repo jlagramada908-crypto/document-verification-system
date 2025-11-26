@@ -10,195 +10,205 @@
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
 
-        /* Hero Section */
+    /* Hero Section */
+    .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px 20px 120px;
+        gap: 15px;
+    }
+
+    .logo-container {
+        margin-bottom: 5px;
+    }
+
+    .university-name {
+        color: white;
+        font-size: 1em;
+        font-weight: 500;
+        margin-top: 12px;
+    }
+
+    .shield-icon {
+        width: 130px;
+        height: 130px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+        animation: float 3s ease-in-out infinite;
+        padding: 10px;
+    }
+
+    .shield-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .hero h1 {
+        color: white;
+        font-size: 2.2em;
+        font-weight: 700;
+        margin-bottom: 8px;
+        line-height: 1.2;
+    }
+
+    .hero .subtitle {
+        color: rgba(255,255,255,0.95);
+        font-size: 1.15em;
+        margin-bottom: 20px;
+        max-width: 750px;
+        font-weight: 300;
+    }
+
+    /* Portal Cards */
+    .portals {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        max-width: 900px;
+        width: 100%;
+        padding: 0 20px;
+    }
+
+    .portal-card {
+        background: white;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .portal-card:hover {
+        transform: translateY(-6px);
+    }
+
+    .portal-icon {
+        font-size: 3.2em;
+        margin-bottom: 18px;
+    }
+
+    .portal-title {
+        font-size: 1.6em;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .portal-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 22px;
+        font-size: 1.05em;
+    }
+
+    .portal-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-size: 1.05em;
+        font-weight: 600;
+        display: inline-block;
+        text-decoration: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .portal-button:hover {
+        opacity: 0.9;
+    }
+
+    /* Footer */
+    .footer {
+        background: rgba(0,0,0,0.25);
+        color: white;
+        text-align: center;
+        padding: 22px 15px;
+        position: relative;
+        margin-top: 50px;
+        font-size: 0.95em;
+    }
+
+    /* Float Animation */
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+    }
+
+    /* MOBILE OPTIMIZATION */
+    @media (max-width: 768px) {
         .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px 20px 80px 20px;
-            gap: 10px;
-        }
-
-        .logo-container {
-            margin-bottom: 10px;
-        }
-
-        .university-name {
-            color: white;
-            font-size: 0.95em;
-            font-weight: 500;
-            margin-top: 10px;
+            padding: 50px 20px 140px;
         }
 
         .shield-icon {
-            width: 120px;
-            height: 120px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: float 3s ease-in-out infinite;
-            padding: 8px;
-        }
-
-        .shield-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            width: 110px;
+            height: 110px;
         }
 
         .hero h1 {
-            color: white;
-            font-size: 2em;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 1.7em;
         }
 
         .hero .subtitle {
-            color: rgba(255,255,255,0.95);
-            font-size: 1.1em;
-            margin-bottom: 8px;
-            font-weight: 300;
-        }
-
-        .hero .institution {
-            color: rgba(255,255,255,0.9);
             font-size: 1em;
-            margin-bottom: 15px;
-            font-weight: 400;
-        }
-
-        /* Footer */
-        .footer {
-            background: rgba(0,0,0,0.2);
-            color: white;
-            text-align: center;
-            padding: 20px;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-
-        .footer p {
-            margin: 0;
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        /* Portal Cards */
-        .portals {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            max-width: 800px;
-            width: 100%;
-            padding: 0 20px;
+            padding: 0 10px;
         }
 
         .portal-card {
-            background: white;
-            border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-
-        .portal-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .portal-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-            display: block;
         }
 
         .portal-title {
-            font-size: 1.5em;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 1.3em;
         }
 
-        .portal-description {
-            color: #666;
-            line-height: 1.5;
-            margin-bottom: 20px;
+        .footer {
+            padding: 18px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero h1 {
+            font-size: 1.5em;
+        }
+
+        .hero .subtitle {
             font-size: 0.95em;
         }
 
+        .portal-description {
+            font-size: 0.9em;
+        }
+
         .portal-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
+            font-size: 0.9em;
         }
+    }
+</style>
 
-        .portal-button:hover {
-            opacity: 0.9;
-        }
-
-        /* Float Animation */
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 1.5em;
-            }
-
-            .hero .subtitle {
-                font-size: 1em;
-            }
-
-            .portals {
-                grid-template-columns: 1fr;
-            }
-
-            .shield-icon {
-                width: 100px;
-                height: 100px;
-            }
-
-            .hero {
-                padding-bottom: 80px;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Hero Section -->
