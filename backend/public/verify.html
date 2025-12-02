@@ -1793,7 +1793,7 @@ function checkCameraSupport() {
         // Clear container
         viewerContainer.innerHTML = '';
         
-        const documentUrl = `${API_BASE_URL}/documents/view-protected/${documentHash}`; // ✅ FIXED: API_BASE_URL
+        const documentUrl = `${API_BASE_URL}/view-protected/${documentHash}`; // ✅ FIXED: API_BASE_URL
         
         // Add view-only notice
         const notice = document.createElement('div');
