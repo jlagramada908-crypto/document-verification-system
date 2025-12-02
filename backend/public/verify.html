@@ -1203,7 +1203,7 @@ html {
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     
     <script>
-    const API_BASE_URL = window.location.origin + '/api'; // ✅ FIXED: Consistent variable name
+    const API_BASE_URL = '/api'; // ✅ FIXED: Consistent variable name
     let qrScanner = null;
     let scannerActive = false;
     let currentDocumentHash = '';
@@ -1793,7 +1793,7 @@ function checkCameraSupport() {
         // Clear container
         viewerContainer.innerHTML = '';
         
-        const documentUrl = `${API_BASE_URL}/view-protected/${documentHash}`; // ✅ FIXED: API_BASE_URL
+        const documentUrl = `${API_BASE_URL}/documents/view-protected/${documentHash}`; // ✅ FIXED: API_BASE_URL
         
         // Add view-only notice
         const notice = document.createElement('div');
